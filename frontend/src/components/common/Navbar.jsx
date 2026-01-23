@@ -95,9 +95,10 @@ const Navbar = () => {
               ))}
 
               <Link to="/upload" onClick={() => setIsMenuOpen(false)}>
-                <Button className="w-full mt-2 bg-accent text-accent-foreground hover:bg-accent/90">
-                  Get Started
+                <Button className="w-full mt-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold hover:from-blue-500 hover:to-indigo-500 transition-all duration-300 shadow-lg hover:shadow-xl">
+                  Get Started →
                 </Button>
+
               </Link>
             </div>
           </div>

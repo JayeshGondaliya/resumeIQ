@@ -15,7 +15,7 @@ import {
 } from "../services/mockData";
 
 import Button from "../components/ui/button";
-import { useMockLoading } from "../hooks/useMockLoading"; // ✅ FIXED
+import { useMockLoading } from "../hooks/useMockLoading";
 
 const Analysis = () => {
   const loading = useMockLoading(1500);

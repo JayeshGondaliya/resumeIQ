@@ -10,6 +10,13 @@
 /* ResumeIQ Design System - Professional & Modern */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+.form-input {
+  @apply w-full px-3 py-2 rounded bg-slate-800 border border-slate-600 text-sm focus:outline-none focus:border-blue-500;
+}
+
+.form-textarea {
+  @apply w-full px-3 py-2 rounded bg-slate-800 border border-slate-600 text-sm focus:outline-none focus:border-blue-500;
+}
 
 @layer base {
   :root {
