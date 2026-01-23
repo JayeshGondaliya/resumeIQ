@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+python-multipart
+pdfplumber
+python-dotenv
+
+
+#for python server run
+#uvicorn app.main:app --reload
