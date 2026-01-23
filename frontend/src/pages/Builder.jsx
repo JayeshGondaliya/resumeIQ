@@ -12,7 +12,7 @@ import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
 /* =========================================
-   1. RESUME TEMPLATES
+   1. RESUME TEMPLATE
    ========================================= */
 
 const NotionTemplate = ({ data, config }) => (
