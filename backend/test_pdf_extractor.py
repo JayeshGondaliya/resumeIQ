@@ -2,6 +2,7 @@ from utils.pdf_extractor import extract_text_from_pdf, ScannedPDFError
 from utils.gemini_client import extract_resume_json_with_gemini, GeminiError
 from utils.job_parser import extract_job_json_with_gemini, GeminiError
 from utils.ats_score import calculate_ats_score
+from utils.resume_improvements import generate_resume_improvements
 
 
 def main():
@@ -20,6 +21,8 @@ def main():
 
         ats_score = calculate_ats_score(cleaned_text, job_json)
 
+        improvements = generate_resume_improvements(cleaned_text, job_json, ats_score)
+
         print("\n✅ CLEANED RESUME TEXT\n")
         print("-" * 60)
         print(cleaned_text)
@@ -33,6 +36,11 @@ def main():
         print("\n✅ ATS SCORE\n")
         print("-" * 60)
         print(ats_score)
+        print("-" * 60)
+
+        print("\n✅ RESUME IMPROVEMENTS\n")
+        print("-" * 60)
+        print(improvements)
         print("-" * 60)
 
     except ScannedPDFError as e:
