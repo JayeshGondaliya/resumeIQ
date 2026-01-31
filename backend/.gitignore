@@ -1,0 +1,14 @@
+# Ignore virtual environment
+venv/
+
+# Ignore model files
+*.gguf
+models/
+resume_parser/models/
+
+# Ignore cache
+__pycache__/
+*.pyc
+
+# Ignore env keys
+.env

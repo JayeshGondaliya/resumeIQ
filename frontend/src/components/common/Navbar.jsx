@@ -95,7 +95,11 @@ const Navbar = () => {
               ))}
 
               <Link to="/upload" onClick={() => setIsMenuOpen(false)}>
-                <Button className="w-full mt-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold hover:from-blue-500 hover:to-indigo-500 transition-all duration-300 shadow-lg hover:shadow-xl">
+                <Button
+                  variant="gradient"
+                  size="md"
+                  className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:from-blue-500 hover:to-indigo-500 shadow-lg hover:shadow-xl"
+                >
                   Get Started →
                 </Button>
 

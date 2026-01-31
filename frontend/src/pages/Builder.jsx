@@ -498,9 +498,9 @@ const ResumeBuilder = () => {
               {design.template === 'modern' ? <ModernTemplate data={data} design={design} config={config} /> : <NotionTemplate data={data} config={config} />}
             </div>
           </div>
-          <div className="absolute bottom-8 lg:bottom-8 bg-slate-900/90 backdrop-blur px-6 py-2 rounded-full text-xs font-bold text-white shadow-lg flex items-center gap-2 print:hidden">
+          {/* <div className="absolute bottom-8 lg:bottom-8 bg-slate-900/90 backdrop-blur px-6 py-2 rounded-full text-xs font-bold text-white shadow-lg flex items-center gap-2 print:hidden">
             <Layout size={14} className="text-indigo-400" /> Live A4 Preview
-          </div>
+          </div> */}
           {/* Mobile Back Button */}
           <button onClick={() => setMobileView('editor')} className="lg:hidden absolute top-4 left-4 bg-slate-900 text-white p-2 rounded-full shadow-lg z-50">
             <ArrowUp className="-rotate-90" size={20} />

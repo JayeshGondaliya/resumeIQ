@@ -1,85 +1,183 @@
-import React from "react";
-import { Download, Share2 } from "lucide-react";
-
-import AtsScoreCard from "../components/analysis/AtsScoreCard";
-import RoleSuggestionCard from "../components/analysis/RoleSuggestionCard";
-import ImprovementList from "../components/analysis/ImprovementList";
-import RoadmapView from "../components/roadmap/Roadmapview";
-import Loader from "../components/common/Loader";
-
-import {
-  mockATSScore,
-  mockRoleRecommendations,
-  mockSuggestions,
-  mockRoadmap,
-} from "../services/mockData";
-
-import Button from "../components/ui/button";
-import { useMockLoading } from "../hooks/useMockLoading";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Analysis = () => {
-  const loading = useMockLoading(1500);
+  const navigate = useNavigate();
+  const [resumeData, setResumeData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const isRoadmapUnlocked = mockATSScore.overall >= 60;
+  useEffect(() => {
+    const stored = localStorage.getItem("resumeData");
+
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        setResumeData(parsed);
+      } catch (err) {
+        console.error("Invalid JSON:", err);
+      }
+    }
+
+    setTimeout(() => setLoading(false), 500); // small delay
+  }, []);
 
   if (loading) {
     return (
-      <div className="min-h-screen pt-24 flex items-center justify-center">
-        <Loader size="lg" text="Analyzing your resume..." />
+      <div style={{ textAlign: "center", marginTop: "100px" }}>
+        <h2>Analyzing your resume...</h2>
       </div>
     );
   }
 
+  if (!resumeData) {
+    return (
+      <div style={{ textAlign: "center", marginTop: "100px" }}>
+        <h2>No analysis data found</h2>
+        <button onClick={() => navigate("/upload")}>Go Back</button>
+      </div>
+    );
+  }
+
+  const atsScore = resumeData.ats_score || {};
+  const improvements = resumeData.improvements || {};
+  const roadmap = resumeData.roadmap || {};
+  const finalScore = atsScore.final_score || 0;
+  const atsPassed = resumeData.ats_passed || false;
+
+  // ================= RENDER =================
   return (
-    <div className="min-h-screen pt-24 pb-16">
-      <div className="container mx-auto px-4">
+    <div style={{ padding: "40px", maxWidth: "1000px", margin: "auto" }}>
+      <h1>Analysis Results</h1>
 
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
-          <div>
-            <h1 className="text-3xl md:text-4xl font-bold mb-2">
-              Analysis Results
-            </h1>
-            <p className="text-muted-foreground">
-              Here's how your resume performs with ATS systems
-            </p>
-          </div>
+      {/* ================= ATS SCORE ================= */}
+      <div style={{ marginTop: "30px", padding: "20px", border: "1px solid #ddd" }}>
+        <h2>ATS Score</h2>
+        <p>
+          <strong>Final Score:</strong> {finalScore}
+        </p>
+        <p>
+          <strong>Status:</strong> {atsPassed ? "✅ Passed ATS" : "❌ Not Passed"}
+        </p>
 
-          <div className="flex items-center gap-3">
-            <Button variant="outline" className="gap-2">
-              <Share2 className="w-4 h-4" />
-              Share
-            </Button>
-            <Button variant="outline" className="gap-2">
-              <Download className="w-4 h-4" />
-              Export PDF
-            </Button>
-          </div>
-        </div>
+        {atsScore.breakdown && (
+          <>
+            <h4>Score Breakdown:</h4>
+            <ul>
+              {Object.entries(atsScore.breakdown).map(([key, value], index) => {
+                // If the value is an object (like required_skills), display each property
+                if (typeof value === "object") {
+                  return (
+                    <li key={index}>
+                      <strong>{key}:</strong>
+                      <ul>
+                        {Object.entries(value).map(([subKey, subValue], subIndex) => {
+                          // If array, join it
+                          if (Array.isArray(subValue)) {
+                            return (
+                              <li key={subIndex}>
+                                {subKey}: {subValue.join(", ")}
+                              </li>
+                            );
+                          }
+                          // If object with matched/missing
+                          if (typeof subValue === "object") {
+                            return (
+                              <li key={subIndex}>
+                                {subKey}: {JSON.stringify(subValue)}
+                              </li>
+                            );
+                          }
+                          return (
+                            <li key={subIndex}>
+                              {subKey}: {subValue}
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </li>
+                  );
+                }
+                return (
+                  <li key={index}>
+                    {key}: {value}
+                  </li>
+                );
+              })}
+            </ul>
+          </>
+        )}
+      </div>
 
-        {/* Content */}
-        <div className="space-y-8">
-          <AtsScoreCard score={mockATSScore} />
+      {/* ================= IMPROVEMENTS ================= */}
+      <div style={{ marginTop: "40px", padding: "20px", border: "1px solid #ddd" }}>
+        <h2>📌 Improvements</h2>
 
-          <div className="glass-card p-6 md:p-8">
-            <h2 className="text-xl font-semibold mb-6">
-              🎯 Role Recommendations
-            </h2>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {mockRoleRecommendations.map((role) => (
-                <RoleSuggestionCard key={role.id} role={role} />
-              ))}
+        {improvements && Object.keys(improvements).length === 0 ? (
+          <p>No improvements available</p>
+        ) : (
+          Object.entries(improvements).map(([type, items], idx) => (
+            <div key={idx} style={{ marginBottom: "20px" }}>
+              <h3>{type.replace(/_/g, " ")}</h3>
+              {Array.isArray(items) ? (
+                <ul>
+                  {items.map((item, i) => (
+                    <li key={i}>
+                      {typeof item === "object"
+                        ? Object.entries(item)
+                          .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(", ") : v}`)
+                          .join(" | ")
+                        : item}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p>{JSON.stringify(items)}</p> // fallback if items is not an array
+              )}
             </div>
-          </div>
+          ))
+        )}
+      </div>
 
-          <ImprovementList suggestions={mockSuggestions} />
-
-          <RoadmapView
-            roadmap={mockRoadmap}
-            isUnlocked={isRoadmapUnlocked}
-          />
-        </div>
+      {/* ================= ROADMAP ================= */}
+      <div style={{ marginTop: "40px", padding: "20px", border: "1px solid #ddd" }}>
+        <h2>🗺 Roadmap</h2>
+        {finalScore >= 60 ? (
+          <>
+            <p>
+              <strong>Total Duration:</strong> {roadmap.total_duration}
+            </p>
+            <p>
+              <strong>Overview:</strong> {roadmap.roadmap_overview}
+            </p>
+            {Array.isArray(roadmap.weekly_plan) &&
+              roadmap.weekly_plan.map((week, index) => (
+                <div
+                  key={index}
+                  style={{
+                    border: "1px solid #ccc",
+                    padding: "15px",
+                    marginTop: "15px",
+                  }}
+                >
+                  <h4>Week {week.week}</h4>
+                  <p>
+                    <strong>Focus:</strong> {week.focus}
+                  </p>
+                  <p>
+                    <strong>Learning:</strong> {week.learning}
+                  </p>
+                  <p>
+                    <strong>Practice:</strong> {week.practice}
+                  </p>
+                  <p>
+                    <strong>Deliverables:</strong> {week.deliverables}
+                  </p>
+                </div>
+              ))}
+          </>
+        ) : (
+          <p>Roadmap unlocks when score is 60 or above.</p>
+        )}
       </div>
     </div>
   );
