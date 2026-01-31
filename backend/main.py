@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from utils.pdf_extractor import extract_text_from_pdf, ScannedPDFError
@@ -36,7 +36,7 @@ async def save_pdf(file: UploadFile) -> str:
 
 
 # Process the resume PDF
-def process_resume(pdf_path: str, job_title: str = "Flutter Developer") -> dict:
+def process_resume(pdf_path: str, job_title: str = "Mern Stack devloper") -> dict:
     try:
         raw_text = extract_text_from_pdf(pdf_path)
         cleaned_text = extract_resume_json_with_openrouter(raw_text)
@@ -75,13 +75,25 @@ def process_resume(pdf_path: str, job_title: str = "Flutter Developer") -> dict:
             os.remove(pdf_path)
 
 
-# FastAPI endpoint for frontend
+# -----------------------------
+# API endpoint: job_title now required
+# -----------------------------
 @app.post("/api/upload")
-async def upload_resume(file: UploadFile = File(...), job_title: str = "Flutter Developer"):
+async def upload_resume(
+    file: UploadFile = File(...),
+    job_title: str = Form(...)  # <-- required, no default
+):
     try:
-        pdf_path = await save_pdf(file)  # <-- await here
+        # Optional check if frontend forgets to send job_title
+        if not job_title.strip():
+            return JSONResponse({"error": "Job title is required"}, status_code=400)
+
+        pdf_path = await save_pdf(file)
         result = process_resume(pdf_path, job_title)
+        # print("job title:"+job_title)
+
+        print("result:", result)
         return JSONResponse(result)
+
     except Exception as e:
         return JSONResponse({"error": str(e)}, status_code=500)
-
